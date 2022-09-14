@@ -1,0 +1,189 @@
+﻿<Window x:Class="MusicPlayer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MusicPlayer"
+        mc:Ignorable="d"
+        Title="MusicPlayerApp" Height="450" Width="800" WindowStyle="None" WindowStartupLocation="CenterScreen" 
+        FontFamily="Verdana" Foreground="#FFDAD4D4">
+    <Window.Resources>
+        <ResourceDictionary>
+            <Style x:Key="ControlStyle" TargetType="Control">
+                <Setter Property="FontFamily" Value="Segou UI"></Setter>
+                <Setter Property="FontSize" Value="14"></Setter>
+            </Style>
+            <Style TargetType="Label" BasedOn="{StaticResource ControlStyle}"></Style>
+            <Style TargetType="Button" BasedOn="{StaticResource ControlStyle}"></Style>
+            <SolidColorBrush x:Key="PrimaryForeground" Color="#FFDAD4D4"></SolidColorBrush>
+
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid x:Name="MainLayout_Grid">
+
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#FF202634" Offset="0"></GradientStop>
+                <GradientStop Color="#FF191416" Offset="1"></GradientStop>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="12*"></RowDefinition>
+            <RowDefinition Height="2*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="2*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <!-- NAVBAR UI PART -->
+        <Grid x:Name="NavBarGrid" Background="#FF202634" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"></ColumnDefinition>
+                <ColumnDefinition Width="2*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" Content="Music Player App"
+                   HorizontalAlignment="Left" FontSize="16" Foreground="{DynamicResource PrimaryForeground}"
+                   VerticalContentAlignment="Center">
+            </Label>
+            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" FlowDirection="RightToLeft">
+                <Button Template="{DynamicResource CloseBtnTemplate}" x:Name="CloseApp_Btn" 
+                        MaxWidth="30" MaxHeight="30" Click="CloseApp_Btn_Click">
+                    <Image x:Name="CloseImage" Source="/StaticImages/CloseButton.png" ></Image>
+                </Button>
+                <Button Template="{DynamicResource NavbarAddBtns}" Width="30" Height="30" x:Name="FullScreen_Btn" 
+                        Foreground="{DynamicResource PrimaryForeground}" Click="FullScreen_Btn_Click">
+                    <Image x:Name="WindowMode_Image" Source="/StaticImages/FullScreen.png" MaxWidth="20" MaxHeight="20"></Image>
+                </Button>
+                <Button Template="{DynamicResource NavbarAddBtns}" Width="30" Height="30" x:Name="Collapse_Btn"
+                        Foreground="{DynamicResource PrimaryForeground}" Click="Collapse_Btn_Click">
+                    <Image Source="/StaticImages/Collapse.png" MaxWidth="20"></Image>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- BODY UI PART -->
+        <Image x:Name="SongAlbum_Image" Grid.Row="1" Grid.Column="0" MinWidth="100">
+            
+        </Image>
+        <Grid x:Name="bodySongsLayout" Grid.Row="1" Grid.Column="1">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.7*"/>
+                <RowDefinition Height="0.5*"/>
+                <RowDefinition Height="0.5*"/>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Border BorderBrush="AliceBlue" BorderThickness="1" VerticalAlignment="Center"
+                    HorizontalAlignment="Center" CornerRadius="20">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Offset="0.4" Color="#FF202634"></GradientStop>
+                        <GradientStop Offset="1" Color="#FF1C1B29"></GradientStop>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Label Grid.Row="0" Grid.Column="1" Foreground="{StaticResource PrimaryForeground}"
+                   VerticalAlignment="Bottom" FontSize="22" HorizontalAlignment="Center">
+                    Your Songs
+                </Label>
+            </Border>
+            <Label Grid.Row="1" Grid.Column="0" Foreground="{StaticResource PrimaryForeground}" 
+                   VerticalAlignment="Bottom" FontSize="18">
+                Search:
+            </Label>
+            <TextBox x:Name="SearchSongs_TxtBox" Grid.Column="0" Grid.Row="2"
+                     Foreground="{StaticResource PrimaryForeground}" FontSize="16"
+                     HorizontalAlignment="Left" MinWidth="500" TextChanged="TextBox_TextChanged">
+                <TextBox.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Offset="0.0" Color="#3C3838"></GradientStop>
+                        <GradientStop Offset="1.0" Color="#222121"></GradientStop>
+                    </LinearGradientBrush>
+                </TextBox.Background>
+            </TextBox>
+            <ListBox x:Name="Songs_ListBox" Grid.Column="0" Grid.Row="3" VerticalAlignment="Center"
+                     MinHeight="180" FontSize="16" Foreground="{StaticResource PrimaryForeground}" 
+                     Background="#FF1C1B29" SelectionChanged="Songs_ListBox_SelectionChanged">
+            </ListBox>
+            <Button x:Name="AddSongs_Btn" Grid.Column="0" Grid.Row="4" 
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Click="AddSongs_Btn_Click">
+                Add Songs
+            </Button>
+        </Grid>
+        <!-- FOOTER UI PART -->
+        <Grid x:Name="Footer_Grid" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Background="#FF191416">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="6*"></ColumnDefinition>
+                <ColumnDefinition Width="1.4*"></ColumnDefinition>
+                <ColumnDefinition Width="3*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="3*"></ColumnDefinition>
+                <ColumnDefinition Width="1.4*"></ColumnDefinition>
+                <ColumnDefinition Width="3*"></ColumnDefinition>
+                <ColumnDefinition Width="0.5*"></ColumnDefinition>
+                <ColumnDefinition Width="2.5*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="PlayPause_Btn" Width="30" Height="30" Template="{DynamicResource PlayPauseBtn}"
+                    Grid.Row="0" Grid.Column="5" ToolTip="Play" Click="PlayPause_Btn_Click">
+                <Image x:Name="PlayPauseBtnState_Image" Source="/StaticImages/Play.png"></Image>
+            </Button>
+            <Button x:Name="Next_Btn" Template="{DynamicResource BtnFooter}" Grid.Column="6" Grid.Row="0" ToolTip="Next"
+                    Click="Next_Btn_Click">
+                <Image Source="/StaticImages/Next.png"></Image>
+            </Button>
+            <Button x:Name="Prev_Btn" Template="{DynamicResource BtnFooter}" Grid.Column="4" Grid.Row="0" ToolTip="Previous"
+                    Click="Prev_Btn_Click">
+                <Image Source="/StaticImages/Prev.png"></Image>
+            </Button>
+            <Button x:Name="Repeat_Btn" Template="{DynamicResource BtnFooter}" Grid.Column="7" Grid.Row="0" ToolTip="Repeat"
+                    Click="Repeat_Btn_Click">
+                <Image x:Name="RepeatMode_Image" Source="/StaticImages/Repeat.png"></Image>
+            </Button>
+            <Button x:Name="Mix_Btn" Template="{DynamicResource BtnFooter}" Grid.Column="3" Grid.Row="0" ToolTip="Mix"
+                    Click="Mix_Btn_Click">
+                <Image x:Name="MixMode_Image" Source="/StaticImages/Mix.png"></Image>
+            </Button>
+            <Label x:Name="CurrentSongTime_Lbl" Content="00:00" Grid.Row="1" Grid.Column="1"
+                   Foreground="{StaticResource PrimaryForeground}">
+            </Label>
+            <ProgressBar x:Name="SongProgress_PgBar" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="7"
+                         Minimum="0" MouseDown="SongProgress_PgBar_MouseDown" VerticalAlignment="Center"
+                         MinHeight="6">
+            </ProgressBar>
+            <Label x:Name="SongDuration_Lbl" Content="00:00" Grid.Row="1" Grid.Column="9"
+                   Foreground="{StaticResource PrimaryForeground}">
+            </Label>
+            <Button x:Name="Volume_Btn" Grid.Column="11" Grid.Row="0" Grid.RowSpan="2"
+                    VerticalAlignment="Center" 
+                    Template="{DynamicResource BtnFooter}">
+                <Image x:Name="Volume_Image" Source="/StaticImages/Volume.png"></Image>
+            </Button>
+            <Slider x:Name="Volume_Slider" Grid.Column="12" Grid.Row="0"
+                    Grid.RowSpan="2" VerticalAlignment="Center" Minimum="0" Maximum="1"
+                    Value="0.5" ValueChanged="Volume_Slider_ValueChanged">
+
+            </Slider>
+        </Grid>
+    </Grid>
+</Window>
