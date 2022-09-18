@@ -16,7 +16,6 @@
             <Style TargetType="Label" BasedOn="{StaticResource ControlStyle}"></Style>
             <Style TargetType="Button" BasedOn="{StaticResource ControlStyle}"></Style>
             <SolidColorBrush x:Key="PrimaryForeground" Color="#FFDAD4D4"></SolidColorBrush>
-
         </ResourceDictionary>
     </Window.Resources>
     <Grid x:Name="MainLayout_Grid">
@@ -72,9 +71,15 @@
         </Grid>
 
         <!-- BODY UI PART -->
-        <Image x:Name="SongAlbum_Image" Grid.Row="1" Grid.Column="0" MinWidth="100">
-            
-        </Image>
+        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">  
+            <Image x:Name="SongAlbum_Image" MinWidth="100" MinHeight="200" VerticalAlignment="Center">
+
+            </Image>
+            <Label x:Name="SongName_Lbl" Foreground="{StaticResource PrimaryForeground}" FontSize="17" HorizontalContentAlignment="Center">
+                
+            </Label>
+        </StackPanel>
+
         <Grid x:Name="bodySongsLayout" Grid.Row="1" Grid.Column="1">
 
             <Grid.ColumnDefinitions>
@@ -114,14 +119,21 @@
                     </LinearGradientBrush>
                 </TextBox.Background>
             </TextBox>
-            <ListBox x:Name="Songs_ListBox" Grid.Column="0" Grid.Row="3" VerticalAlignment="Center"
+            <ListBox  x:Name="Songs_ListBox" Grid.Column="0" Grid.Row="3" VerticalAlignment="Center"
                      MinHeight="180" FontSize="16" Foreground="{StaticResource PrimaryForeground}" 
                      Background="#FF1C1B29" SelectionChanged="Songs_ListBox_SelectionChanged">
             </ListBox>
-            <Button x:Name="AddSongs_Btn" Grid.Column="0" Grid.Row="4" 
+            <StackPanel Orientation="Horizontal" FlowDirection="LeftToRight" Grid.Column="0" Grid.Row="4"
+                        HorizontalAlignment="Center">
+                <Button Template="{DynamicResource GreenRoundBtn}"  x:Name="AddSongs_Btn" Grid.Column="0" Grid.Row="4" 
                     HorizontalAlignment="Center" VerticalAlignment="Center" Click="AddSongs_Btn_Click">
-                Add Songs
-            </Button>
+                    Add Songs
+                </Button>
+                <Button Template="{DynamicResource RedRoundBtn}" x:Name="DeleteSong_Btn" HorizontalAlignment="Center" VerticalAlignment="Center" Click="DeleteSong_Btn_Click">
+                    Delete Song
+                </Button>
+            </StackPanel>
+
         </Grid>
         <!-- FOOTER UI PART -->
         <Grid x:Name="Footer_Grid" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Background="#FF191416">

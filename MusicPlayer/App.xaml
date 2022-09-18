@@ -68,6 +68,72 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
         
+        
+        <!-- GreenRoundBtn-->
+        <SolidColorBrush x:Key="ButtonGrR.MouseOver.Background" Color="#73F673"/>
+        <SolidColorBrush x:Key="ButtonGrR.MouseOver.Border" Color="Black"/>
+        <SolidColorBrush x:Key="ButtonGrR.Pressed.Background" Color="#73F673"/>
+        <SolidColorBrush x:Key="ButtonGrR.Pressed.Border" Color="Black"/>
+        <SolidColorBrush x:Key="ButtonGrR.Disabled.Background" Color="#FFF4F4F4"/>
+        <SolidColorBrush x:Key="ButtonGrR.Disabled.Border" Color="Black"/>
+        <SolidColorBrush x:Key="ButtonGrR.Disabled.Foreground" Color="#FF838383"/>
+        <ControlTemplate x:Key="GreenRoundBtn" TargetType="{x:Type ButtonBase}">
+            <Border x:Name="border" Background="#1DB954" BorderBrush="Black" BorderThickness="1.5" SnapsToDevicePixels="true"
+                    CornerRadius="10">
+                <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="Button.IsDefaulted" Value="true">
+                    <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter Property="Background" TargetName="border" Value="{StaticResource ButtonGrR.MouseOver.Background}"/>
+                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource ButtonGrR.MouseOver.Border}"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="true">
+                    <Setter Property="Background" TargetName="border" Value="{StaticResource ButtonGrR.Pressed.Background}"/>
+                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource ButtonGrR.Pressed.Border}"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="false">
+                    <Setter Property="Background" TargetName="border" Value="{StaticResource ButtonGrR.Disabled.Background}"/>
+                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource ButtonGrR.Disabled.Border}"/>
+                    <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource ButtonGrR.Disabled.Foreground}"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <!-- Red ROung Btn-->
+        <SolidColorBrush x:Key="ButtonRRe.MouseOver.Background" Color="#F63737"/>
+        <SolidColorBrush x:Key="ButtonRRe.MouseOver.Border" Color="Black"/>
+        <SolidColorBrush x:Key="ButtonRRe.Pressed.Background" Color="#F63737"/>
+        <SolidColorBrush x:Key="ButtonRRe.Pressed.Border" Color="Black"/>
+        <SolidColorBrush x:Key="ButtonRRe.Disabled.Background" Color="DarkSlateGray"/>
+        <SolidColorBrush x:Key="ButtonRRe.Disabled.Border" Color="Black"/>
+        <SolidColorBrush x:Key="ButtonRRe.Disabled.Foreground" Color="#FF838383"/>
+        <ControlTemplate x:Key="RedRoundBtn" TargetType="{x:Type ButtonBase}">
+            <Border x:Name="border" CornerRadius="8" Background="Red" BorderBrush="Black" BorderThickness="1.5" SnapsToDevicePixels="true">
+                <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="Button.IsDefaulted" Value="true">
+                    <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter Property="Background" TargetName="border" Value="{StaticResource ButtonRRe.MouseOver.Background}"/>
+                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource ButtonRRe.MouseOver.Border}"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="true">
+                    <Setter Property="Background" TargetName="border" Value="{StaticResource ButtonRRe.Pressed.Background}"/>
+                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource ButtonRRe.Pressed.Border}"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="false">
+                    <Setter Property="Background" TargetName="border" Value="{StaticResource ButtonRRe.Disabled.Background}"/>
+                    <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource ButtonRRe.Disabled.Border}"/>
+                    <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource ButtonRRe.Disabled.Foreground}"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
         <!-- Play Pause Button Template-->
         <SolidColorBrush x:Key="ButtonPlayPause.MouseOver.Background1" Color="#F9F6EE"/>
         <SolidColorBrush x:Key="ButtonPlayPause.MouseOver.Border1" Color="Transparent"/>

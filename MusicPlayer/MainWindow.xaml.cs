@@ -19,6 +19,8 @@ using System.Windows.Threading;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Reflection.Emit;
+using System.Collections.ObjectModel;
+using System.Runtime.InteropServices;
 
 namespace MusicPlayer
 {
@@ -34,20 +36,21 @@ namespace MusicPlayer
 
         private bool isMixedMode = false;
 
-        private Dictionary<string, string> namePath = new Dictionary<string, string>();
+        private ObservableCollection<string> songNames = new ObservableCollection<string>();
 
         //если заморочиться можно хранить в файлах и удалять через время простоя
-        private Dictionary<string, string> history = new Dictionary<string, string>();
+        private List<string> history = new List<string>();
 
-        private Dictionary<string, string> mixedCollection = new Dictionary<string, string>();
+        private Dictionary<int, int> mixedCollection;
+
         public MainWindow()
         {
             InitializeComponent();
 
             this.DataContext = _mediaPlayer;
 
-            namePath = _songFileManager.GetAddedSongsPaths();
-            Songs_ListBox.ItemsSource = namePath.Keys;
+            songNames = _songFileManager.GetSongNames();
+            Songs_ListBox.ItemsSource = songNames;
             DisableSongRelatedElements();
             _songFileManager
                 .SetImageSource(PlayPauseBtnState_Image, System.IO.Path.Combine(_baseImagePath, "Play.png"));
@@ -90,20 +93,15 @@ namespace MusicPlayer
             if(fileDialog.ShowDialog() ?? false)
             {
                 string[] paths = fileDialog.FileNames;
-                using (StreamWriter sw = new StreamWriter(_songFileManager.AddedSongsPath, true))
-                {
                     foreach (string path in paths)
                     {
                         string Name = System.IO.Path.GetFileName(path);
-                        if (!namePath.ContainsKey(Name))
+                        if (!songNames.Contains(Name))
                         {
-                            namePath.Add(Name, path);
-                            sw.WriteLine(path);
+                            songNames.Add(Name);
+                            _songFileManager.AddSongEntry(path);
                         }
                     }
-                }
-                Songs_ListBox.ItemsSource = namePath.Keys;
-
             }
         }
 
@@ -111,20 +109,20 @@ namespace MusicPlayer
         {
             if(_mediaPlayer.Source != null)
             {
-                //change labels 
-                CurrentSongTime_Lbl.Content = _mediaPlayer.Position.ToString(@"mm\:ss");
-                
-                if(_mediaPlayer.NaturalDuration.HasTimeSpan)
-                    SongDuration_Lbl.Content = _mediaPlayer.NaturalDuration.TimeSpan.ToString(@"mm\:ss");
-                                         
-                //and progress bar
                 if (_mediaPlayer.NaturalDuration.HasTimeSpan)
-                    SongProgress_PgBar.Maximum = (int)_mediaPlayer.NaturalDuration.TimeSpan.TotalSeconds;
-                SongProgress_PgBar.Value = (int)_mediaPlayer.Position.TotalSeconds;
-
-                if (_mediaPlayer.Position == _mediaPlayer.NaturalDuration.TimeSpan)
                 {
-                    LoadNextSong();
+                    //change labels 
+                    CurrentSongTime_Lbl.Content = _mediaPlayer.Position.ToString(@"mm\:ss");
+                    SongDuration_Lbl.Content = _mediaPlayer.NaturalDuration.TimeSpan.ToString(@"mm\:ss");
+
+                    //and progress bar
+                    SongProgress_PgBar.Maximum = (int)_mediaPlayer.NaturalDuration.TimeSpan.TotalSeconds;
+                    SongProgress_PgBar.Value = (int)_mediaPlayer.Position.TotalSeconds;
+
+                    if (_mediaPlayer.Position == _mediaPlayer.NaturalDuration.TimeSpan)
+                    {
+                        LoadNextSong();
+                    }
                 }
             }
         }
@@ -134,14 +132,15 @@ namespace MusicPlayer
             try
             {
                 string songName = Songs_ListBox.SelectedValue as string;
-                if (namePath.ContainsKey(songName))
+                if (songNames.Contains(songName))
                 {
+                    string path = _songFileManager.GetSongPath(songName);
                     EnableSongRelatedElements();
-                    _mediaPlayer.Open(new Uri(namePath[songName], UriKind.Absolute));
+                    _mediaPlayer.Open(new Uri(path, UriKind.Absolute));
                     _mediaPlayer.Play();
-
+                    SongName_Lbl.Content = songName;
                     //setImage
-                    var file = TagLib.File.Create(namePath[songName]);
+                    var file = TagLib.File.Create(path);
 
                     if(file.Tag.Pictures.Any())
                     {
@@ -158,8 +157,8 @@ namespace MusicPlayer
                     _songFileManager
                         .SetImageSource(PlayPauseBtnState_Image, System.IO.Path.Combine(_baseImagePath, "Pause.png"));
                 }
-                else
-                    throw new ArgumentNullException("Wrond song name");
+                else if (Songs_ListBox.SelectedIndex != -1)
+                    throw new ArgumentNullException("Wrong song name");
             }
             catch (Exception ex)
             {
@@ -224,7 +223,18 @@ namespace MusicPlayer
         private void Mix_Btn_Click(object sender, RoutedEventArgs e)
         {
             isMixedMode = !isMixedMode;
-
+            if(isMixedMode)
+            {
+                int songsCount = Songs_ListBox.Items.Count;
+                int ignoreIndex = Songs_ListBox.SelectedIndex;
+                Random rand = new Random();
+                mixedCollection = new Dictionary<int, int>();
+                for (int i = 0; i < songsCount; i++)
+                {
+                    if(i != ignoreIndex)
+                        mixedCollection.Add(i,i);
+                }
+            }
             _songFileManager.SetImageSource(MixMode_Image, System.IO.Path.Combine(_baseImagePath,
                 isMixedMode ? "MixGreen.png" : "Mix.png"));
 
@@ -247,10 +257,18 @@ namespace MusicPlayer
             }
             else if(isMixedMode)
             {
-
+                int songIndex = -1;
+                Random rand = new Random();
+                while(!mixedCollection.ContainsKey(songIndex) || songIndex == Songs_ListBox.SelectedIndex)
+                {
+                    songIndex = rand.Next(0, mixedCollection.Keys.Max() + 1);
+                }
+                Songs_ListBox.SelectedIndex = songIndex;
+                history.Add(Songs_ListBox.SelectedItem as string);
             }
             else
             {
+                history.Add(Songs_ListBox.SelectedItem as string);
                 Songs_ListBox.SelectedIndex = Songs_ListBox.SelectedIndex == (Songs_ListBox.Items.Count - 1) ? 0 :
                     (Songs_ListBox.SelectedIndex + 1);
             }
@@ -299,10 +317,16 @@ namespace MusicPlayer
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Regex songNameRegex = new Regex("^" + SearchSongs_TxtBox.Text.ToLower());
-            var matchedSongs = namePath.Keys.Where(songName => songNameRegex.IsMatch(songName.ToLower()));
-            Songs_ListBox.ItemsSource = matchedSongs;
-        }
+            if (SearchSongs_TxtBox.Text.Length != 0)
+            {
+
+                Regex songNameRegex = new Regex("^" + SearchSongs_TxtBox.Text.ToLower());
+                var matchedSongs = songNames.Where(songName => songNameRegex.IsMatch(songName.ToLower()));
+                Songs_ListBox.ItemsSource = matchedSongs;
+            }
+            else
+                Songs_ListBox.ItemsSource = songNames;
+        }   
 
         private void SongProgress_PgBar_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -320,6 +344,21 @@ namespace MusicPlayer
             int newSeconds = (int)Math.Ceiling(pgBarValue);
 
             _mediaPlayer.Position = new TimeSpan(0, 0,newSeconds);
+        }
+
+        private void DeleteSong_Btn_Click(object sender, RoutedEventArgs e)
+        {
+            if(Songs_ListBox.SelectedIndex != -1)
+            {
+                _mediaPlayer.Pause();
+                string songName = Songs_ListBox.SelectedItem as string;
+                _songFileManager.RemoveSongEntry(songName);
+                if (mixedCollection.ContainsKey(Songs_ListBox.SelectedIndex))
+                    mixedCollection.Remove(Songs_ListBox.SelectedIndex);
+                Songs_ListBox.SelectedIndex = -1;
+                songNames.Remove(songName);
+
+            }
         }
     }
 }

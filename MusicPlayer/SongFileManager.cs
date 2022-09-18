@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Media.Imaging;
 using System.Windows.Controls;
+using System.Collections.ObjectModel;
 
 namespace MusicPlayer
 {
@@ -82,6 +83,37 @@ namespace MusicPlayer
                 }
             }
             return namePath;
+        }
+
+        public string GetSongPath(string songName)
+        {
+            return File.ReadAllLines(_addedSongsFilePath).FirstOrDefault(l => Path.GetFileName(l) == songName);
+        }
+
+        public void AddSongEntry(string songPath)
+        {
+            using(StreamWriter sw = new StreamWriter(_addedSongsFilePath,true))
+            {
+                sw.WriteLine(songPath);
+            }
+        }
+
+        public ObservableCollection<string> GetSongNames()
+        {
+            var lines = File.ReadAllLines(_addedSongsFilePath);
+            ObservableCollection<string> names = new ObservableCollection<string>();
+            foreach(var line in lines)
+            {
+                names.Add(Path.GetFileName(line));
+            }
+            return names;
+        }
+
+        public void RemoveSongEntry(string songName)
+        {
+           var lines = File.ReadAllLines(_addedSongsFilePath).
+                Where(l => Path.GetFileName(l) != songName);
+            File.WriteAllLines(_addedSongsFilePath, lines);
         }
     }
 }
